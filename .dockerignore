@@ -1,0 +1,8 @@
+**/node_modules
+client/dist
+data
+.env
+.env.*
+.git
+legacy-static-app
+*.log
