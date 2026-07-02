@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Papa Rica | Dashboard de Unidades de Negócio</title>
+    <meta name="description" content="Dashboard premium de controle de investimento, CAC, pedidos e ROAS para as unidades Papa Rica.">
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- SheetJS (xlsx) for reading/writing Excel sheets -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="brand-section">
+                <!-- Branding Logo using the extracted official Papa Rica favicon logo -->
+                <img src="https://static.wixstatic.com/media/ea57c6_57502bc1502149e3a0cb7dabab3572f0~mv2.png/v1/fill/w_180,h_180,lg_1/ea57c6_57502bc1502149e3a0cb7dabab3572f0~mv2.png" alt="Papa Rica Logo" class="brand-logo">
+                <span class="brand-name">Papa Rica</span>
+            </div>
+            
+            <nav>
+                <ul class="menu-list">
+                    <li>
+                        <a class="menu-item active" id="menu-overview">
+                            <svg viewBox="0 0 24 24">
+                                <rect x="3" y="3" width="7" height="9" rx="1"></rect>
+                                <rect x="14" y="3" width="7" height="5" rx="1"></rect>
+                                <rect x="14" y="12" width="7" height="9" rx="1"></rect>
+                                <rect x="3" y="16" width="7" height="5" rx="1"></rect>
+                            </svg>
+                            <span>Visão Geral</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="menu-item" id="menu-units">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                            </svg>
+                            <span>Unidades</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="menu-item" id="menu-editor">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4z"></path>
+                            </svg>
+                            <span>Editor de Dados</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="menu-item" id="menu-importer">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                            <span>Importar Planilha</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button class="theme-toggle-btn" id="theme-toggle" title="Alternar tema claro/escuro">
+                    <svg id="theme-icon" viewBox="0 0 24 24">
+                        <!-- Moon Icon (Default for dark toggle) -->
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <span>Tema Escuro</span>
+                </button>
+            </div>
+        </aside>
+        
+        <!-- MAIN CONTENT AREA -->
+        <main class="main-content">
+            
+            <!-- TOP HEADER -->
+            <header class="top-header">
+                <div class="header-title-wrapper">
+                    <h1 id="view-title">Visão Geral do Negócio</h1>
+                    <p id="view-subtitle">Acompanhe as métricas agregadas de todas as unidades.</p>
+                </div>
+                
+                <div class="header-controls">
+                    <!-- Month Selector -->
+                    <select class="custom-select" id="select-month">
+                        <option value="all">Ano Inteiro</option>
+                        <option value="0">Janeiro</option>
+                        <option value="1">Fevereiro</option>
+                        <option value="2">Março</option>
+                        <option value="3">Abril</option>
+                        <option value="4">Maio</option>
+                        <option value="5">Junho</option>
+                        <option value="6" selected>Julho</option>
+                        <option value="7">Agosto</option>
+                        <option value="8">Setembro</option>
+                        <option value="9">Outubro</option>
+                        <option value="10">Novembro</option>
+                        <option value="11">Dezembro</option>
+                    </select>
+                    
+                    <!-- Year Selector -->
+                    <select class="custom-select" id="select-year">
+                        <option value="2026" selected>2026</option>
+                        <option value="2025">2025</option>
+                    </select>
+                </div>
+            </header>
+            
+            <!-- VIEW: OVERVIEW -->
+            <section class="dashboard-view active" id="view-overview-section">
+                <!-- KPI Cards Grid -->
+                <div class="kpi-grid">
+                    <!-- Investment -->
+                    <div class="kpi-card kpi-invest">
+                        <div class="kpi-header">
+                            <span class="kpi-title">Investimento</span>
+                            <div class="kpi-icon-wrapper">
+                                <svg viewBox="0 0 24 24">
+                                    <line x1="12" y1="1" x2="12" y2="23"></line>
+                                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="kpi-value" id="kpi-total-invest">R$ 0,00</div>
+                        <div class="kpi-meta" id="kpi-invest-meta">Total gasto no período</div>
+                    </div>
+                    
+                    <!-- CAC -->
+                    <div class="kpi-card kpi-cac">
+                        <div class="kpi-header">
+                            <span class="kpi-title">CAC Médio</span>
+                            <div class="kpi-icon-wrapper">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="kpi-value" id="kpi-avg-cac">R$ 0,00</div>
+                        <div class="kpi-meta">Custo por novo cliente</div>
+                    </div>
+                    
+                    <!-- Primeiros Pedidos & Pedidos -->
+                    <div class="kpi-card kpi-orders">
+                        <div class="kpi-header">
+                            <span class="kpi-title">Pedidos Totais</span>
+                            <div class="kpi-icon-wrapper">
+                                <svg viewBox="0 0 24 24">
+                                    <circle cx="9" cy="21" r="1"></circle>
+                                    <circle cx="20" cy="21" r="1"></circle>
+                                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="kpi-value" id="kpi-total-orders">0</div>
+                        <div class="kpi-meta" id="kpi-orders-meta">0 prim. pedidos (0%)</div>
+                    </div>
+                    
+                    <!-- ROAS -->
+                    <div class="kpi-card kpi-roas">
+                        <div class="kpi-header">
+                            <span class="kpi-title">ROAS Médio</span>
+                            <div class="kpi-icon-wrapper">
+                                <svg viewBox="0 0 24 24">
+                                    <line x1="18" y1="20" x2="18" y2="10"></line>
+                                    <line x1="12" y1="20" x2="12" y2="4"></line>
+                                    <line x1="6" y1="20" x2="6" y2="14"></line>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="kpi-value" id="kpi-avg-roas">0.0x</div>
+                        <div class="kpi-meta">Retorno do investimento</div>
+                    </div>
+                </div>
+                
+                <!-- Charts Grid -->
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h3>Tendência Mensal (Histórico)</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="trendChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Participação por Unidade</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="shareChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Table View -->
+                <div class="table-card">
+                    <div class="table-header-row">
+                        <h3>Performance por Unidade de Negócio</h3>
+                        <button class="btn btn-secondary" id="btn-export-overview">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            Exportar Excel
+                        </button>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="dashboard-table" id="table-overview">
+                            <thead>
+                                <tr>
+                                    <th>Unidade</th>
+                                    <th>Investimento</th>
+                                    <th>Primeiro Pedido</th>
+                                    <th>Pedidos Totais</th>
+                                    <th>CAC</th>
+                                    <th>Custo por Pedido</th>
+                                    <th>ROAS</th>
+                                    <th>Eficiência</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-overview-body">
+                                <!-- Populated dynamically by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- VIEW: UNITS -->
+            <section class="dashboard-view" id="view-units-section">
+                <div class="units-card-grid" id="units-grid-container">
+                    <!-- Populated dynamically by JS -->
+                </div>
+            </section>
+            
+            <!-- VIEW: DATA EDITOR -->
+            <section class="dashboard-view" id="view-editor-section">
+                <div class="editor-grid">
+                    <!-- Manual Input Form -->
+                    <div class="chart-card">
+                        <h3>Inserir / Atualizar Dados Mensais</h3>
+                        <form id="editor-form">
+                            <div class="form-group">
+                                <label for="form-unit">Unidade de Negócio</label>
+                                <select class="form-control" id="form-unit" required>
+                                    <option value="" disabled selected>Selecione a unidade</option>
+                                    <!-- Options populated dynamically -->
+                                </select>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="form-invest">Investimento (R$)</label>
+                                    <input type="number" step="0.01" min="0" class="form-control" id="form-invest" required placeholder="Ex: 5000.00">
+                                </div>
+                                <div class="form-group">
+                                    <label for="form-roas">ROAS (x)</label>
+                                    <input type="number" step="0.1" min="0" class="form-control" id="form-roas" required placeholder="Ex: 3.5">
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="form-first-orders">Primeiro Pedido (Novos)</label>
+                                    <input type="number" min="0" class="form-control" id="form-first-orders" required placeholder="Ex: 120">
+                                </div>
+                                <div class="form-group">
+                                    <label for="form-total-orders">Pedidos Totais</label>
+                                    <input type="number" min="0" class="form-control" id="form-total-orders" required placeholder="Ex: 300">
+                                </div>
+                            </div>
+                            
+                            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                <button type="submit" class="btn btn-primary" style="flex: 1;">Salvar Dados</button>
+                                <button type="button" class="btn btn-secondary" id="btn-fill-mock">Preencher Dados Demo</button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- Table View of the Selected Unit's History -->
+                    <div class="chart-card">
+                        <h3 id="unit-history-title">Histórico da Unidade</h3>
+                        <div class="table-wrapper" style="max-height: 400px; overflow-y: auto;">
+                            <table class="dashboard-table">
+                                <thead>
+                                    <tr>
+                                        <th>Mês</th>
+                                        <th>Investimento</th>
+                                        <th>CAC</th>
+                                        <th>Pedidos</th>
+                                        <th>ROAS</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-unit-history-body">
+                                    <tr>
+                                        <td colspan="5" style="text-align: center; color: var(--text-muted);">Selecione uma unidade para ver seu histórico.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- VIEW: IMPORTER -->
+            <section class="dashboard-view" id="view-importer-section">
+                <div class="chart-card" style="margin-bottom: 30px;">
+                    <h3>Importador de Planilhas</h3>
+                    <p style="margin-bottom: 20px; color: var(--text-muted);">Arraste seu arquivo Excel (.xlsx, .xls) ou CSV ou clique para selecionar. O sistema processará as abas e linhas de forma inteligente.</p>
+                    
+                    <div class="upload-area" id="drop-zone">
+                        <div class="upload-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="12" y1="18" x2="12" y2="12"></line>
+                                <polyline points="9 15 12 12 15 15"></polyline>
+                            </svg>
+                        </div>
+                        <h4 style="font-size: 16px;">Arraste a planilha aqui ou clique para buscar</h4>
+                        <span style="font-size: 13px; color: var(--text-muted);">Tamanho máximo recomendado: 10MB (.xlsx ou .csv)</span>
+                        <input type="file" id="file-input" accept=".xlsx, .xls, .csv">
+                    </div>
+                </div>
+                
+                <div class="editor-grid">
+                    <div class="chart-card">
+                        <h3>Modelo Estrutural Sugerido</h3>
+                        <p style="margin-bottom: 15px;">Para que sua planilha seja lida perfeitamente, estruture suas colunas da seguinte forma:</p>
+                        
+                        <div class="table-wrapper">
+                            <table class="dashboard-table" style="font-size: 13px;">
+                                <thead>
+                                    <tr>
+                                        <th>Mês</th>
+                                        <th>Unidade</th>
+                                        <th>Investimento</th>
+                                        <th>Primeiro Pedido</th>
+                                        <th>Pedidos</th>
+                                        <th>ROAS</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Julho</td>
+                                        <td>Belo Horizonte</td>
+                                        <td>5200.00</td>
+                                        <td>140</td>
+                                        <td>350</td>
+                                        <td>4.2</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Julho</td>
+                                        <td>Campinas</td>
+                                        <td>4800.00</td>
+                                        <td>110</td>
+                                        <td>290</td>
+                                        <td>3.8</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p style="margin-top: 15px; font-size: 12px; color: var(--text-muted);">* Dica: Se o nome dos meses ou das colunas forem um pouco diferentes, nosso importador inteligente tentará mapear de forma automática!</p>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <h3>Ações e Status</h3>
+                        <div id="import-status" style="margin-bottom: 20px; min-height: 120px; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px;">
+                            <span style="color: var(--text-muted);">Nenhum arquivo processado ainda.</span>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-secondary" id="btn-download-template" style="flex: 1; justify-content: center;">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                                Baixar Modelo Excel
+                            </button>
+                            <button class="btn btn-primary" id="btn-reset-data" style="background: var(--accent-red); flex: 1; justify-content: center;">
+                                Limpar Todos os Dados
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+        </main>
+        
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>
