@@ -41,8 +41,20 @@ export default function ShareChart({ filteredRows, theme }) {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        layout: { padding: 4 },
         plugins: {
-          legend: { position: 'bottom', labels: { color: textColor, font: { family: 'Outfit', size: 11 } } },
+          legend: {
+            position: 'bottom',
+            labels: {
+              color: textColor,
+              font: { family: 'Outfit', size: 11 },
+              usePointStyle: true,
+              pointStyle: 'circle',
+              boxWidth: 8,
+              boxHeight: 8,
+              padding: 10,
+            },
+          },
           tooltip: {
             callbacks: {
               label: (context) => {

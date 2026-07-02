@@ -373,7 +373,8 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: 32px;
 }
 
-@media (max-width: 1024px) {
+/* Empilha mais cedo: com 7+ unidades a legenda do donut precisa de largura */
+@media (max-width: 1200px) {
     .charts-grid {
         grid-template-columns: 1fr;
     }
@@ -387,6 +388,10 @@ h1, h2, h3, h4, h5, h6 {
     box-shadow: var(--shadow-md);
     backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
+    /* Grid children default to min-width:auto — o canvas do Chart.js não
+       encolhe e transborda/corta; min-width:0 permite o card encolher junto */
+    min-width: 0;
+    overflow: hidden;
 }
 
 .chart-card h3 {
@@ -402,6 +407,23 @@ h1, h2, h3, h4, h5, h6 {
     position: relative;
     height: 320px;
     width: 100%;
+    min-width: 0;
+}
+
+@media (max-width: 480px) {
+    .chart-wrapper {
+        height: 280px;
+    }
+
+    .chart-card,
+    .table-card {
+        padding: 16px;
+    }
+
+    .table-wrapper {
+        margin: 0 -16px;
+        padding: 0 16px;
+    }
 }
 
 /* --- DATA TABLES --- */
